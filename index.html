@@ -3,7 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>7x7 Triplet Puzzle</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Trio">
+<title>Trio</title>
 
 <style>
   body {
@@ -79,11 +82,11 @@
 <body>
 
 <div class="app">
-  <h2>7×7 Triplet Puzzle</h2>
-  <div id="counter">Found: 0 / Revealed: 0 / Total: 0</div>
+  <h2>Trio</h2>
+  <div id="counter">Gefunden: 0 / Aufgedeckt: 0 / Total: 0</div>
   <div id="grid"></div>
-  <button onclick="revealNext()">Reveal Next</button>
-  <button onclick="generateGrid()">New Grid</button>
+  <button onclick="revealNext()">Aufdecken</button>
+  <button onclick="generateGrid()">Neues Spiel</button>
 </div>
 
 <script>
@@ -228,8 +231,8 @@ function clearSelection(){
 
 function updateCounter(){
   document.getElementById("counter").textContent=
-    "Found: "+foundCount+
-    " / Revealed: "+revealedCount+
+    "Gefunden "+foundCount+
+    " / Aufgedeckt: "+revealedCount+
     " / Total: "+triplets.length;
 }
 
@@ -246,3 +249,4 @@ generateGrid();
 
 </body>
 </html>
+
