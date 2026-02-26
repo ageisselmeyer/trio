@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>7x7 Triplet Puzzle</title>
+
+<style>
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    background: linear-gradient(135deg, #4e73df, #1cc88a);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+
+  .app {
+    background: white;
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+    text-align: center;
+    width: 360px;
+  }
+
+  #counter {
+    font-size: 14px;
+    margin-bottom: 15px;
+    font-weight: 600;
+    color: #555;
+  }
+
+  #grid {
+    display: grid;
+    grid-template-columns: repeat(7, 40px);
+    gap: 6px;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+
+  .cell {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: #f8f9fc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 600;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+    transition: 0.2s;
+    cursor: pointer;
+  }
+
+  .selected { background: #d0e2ff; }
+  .revealed { background: #4e73df; color: white; }
+  .found { background: darkgreen; color: white; }
+
+  button {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 12px;
+    background: #4e73df;
+    color: white;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    margin: 5px;
+  }
+
+  button:active { transform: scale(0.95); }
+
+</style>
+</head>
+
+<body>
+
+<div class="app">
+  <h2>7×7 Triplet Puzzle</h2>
+  <div id="counter">Found: 0 / Revealed: 0 / Total: 0</div>
+  <div id="grid"></div>
+  <button onclick="revealNext()">Reveal Next</button>
+  <button onclick="generateGrid()">New Grid</button>
+</div>
+
+<script>
+let size = 7;
+let gridData = [];
+let triplets = [];
+let tripletStatus = [];
+
+let foundCount = 0;
+let revealedCount = 0;
+let selectedCells = [];
+
+function generateGrid() {
+  const grid = document.getElementById("grid");
+  grid.innerHTML = "";
+  gridData = [];
+  triplets = [];
+  tripletStatus = [];
+  foundCount = 0;
+  revealedCount = 0;
+  selectedCells = [];
+
+  for (let r = 0; r < size; r++) {
+    gridData[r] = [];
+    for (let c = 0; c < size; c++) {
+      let num = Math.floor(Math.random() * 9) + 1;
+      gridData[r][c] = num;
+
+      const cell = document.createElement("div");
+      cell.className = "cell";
+      cell.id = `cell-${r}-${c}`;
+      cell.textContent = num;
+      cell.onclick = () => selectCell(r,c);
+      grid.appendChild(cell);
+    }
+  }
+
+  findTriplets();
+  updateCounter();
+}
+
+function isValidTriplet(a,b,c){
+  return (a+b===c)||(a+c===b)||(b+c===a);
+}
+
+function findTriplets(){
+  const directions=[[0,1],[1,0],[1,1],[1,-1]];
+
+  for(let r=0;r<size;r++){
+    for(let c=0;c<size;c++){
+      for(let [dr,dc] of directions){
+        let r2=r+dr, c2=c+dc;
+        let r3=r+2*dr, c3=c+2*dc;
+
+        if(r3>=0&&r3<size&&c3>=0&&c3<size){
+          let a=gridData[r][c];
+          let b=gridData[r2][c2];
+          let cVal=gridData[r3][c3];
+
+          if(isValidTriplet(a,b,cVal)){
+            triplets.push([[r,c],[r2,c2],[r3,c3]]);
+            tripletStatus.push("hidden");
+          }
+        }
+      }
+    }
+  }
+
+  shuffleTogether(triplets, tripletStatus);
+}
+
+function revealNext(){
+  for(let i=0;i<triplets.length;i++){
+    if(tripletStatus[i]==="hidden"){
+      markTriplet(triplets[i],"revealed");
+      tripletStatus[i]="revealed";
+      revealedCount++;
+      updateCounter();
+      return;
+    }
+  }
+  alert("All triplets revealed!");
+}
+
+function selectCell(r,c){
+  let cell=document.getElementById(`cell-${r}-${c}`);
+
+  // Only block blue revealed cells
+  if(cell.classList.contains("revealed"))
+    return;
+
+  cell.classList.toggle("selected");
+
+  if(cell.classList.contains("selected")){
+    selectedCells.push([r,c]);
+  } else {
+    selectedCells = selectedCells.filter(x=>!(x[0]===r&&x[1]===c));
+  }
+
+  if(selectedCells.length===3){
+    checkFoundTriplet();
+  }
+}
+
+function checkFoundTriplet(){
+  let coords = selectedCells.map(x=>x.toString()).sort().join("|");
+
+  for(let i=0;i<triplets.length;i++){
+    let tcoords = triplets[i].map(x=>x.toString()).sort().join("|");
+
+    if(coords===tcoords && tripletStatus[i]==="hidden"){
+      markTriplet(triplets[i],"found");
+      tripletStatus[i]="found";
+      foundCount++;
+      break;
+    }
+  }
+
+  clearSelection();
+  updateCounter();
+}
+
+function markTriplet(triplet,type){
+  for(let [r,c] of triplet){
+    let cell=document.getElementById(`cell-${r}-${c}`);
+    cell.classList.remove("selected");
+
+    if(type==="found"){
+      cell.classList.add("found");
+    } else if(type==="revealed" && !cell.classList.contains("found")){
+      cell.classList.add("revealed");
+    }
+  }
+}
+
+function clearSelection(){
+  for(let [r,c] of selectedCells){
+    document.getElementById(`cell-${r}-${c}`).classList.remove("selected");
+  }
+  selectedCells=[];
+}
+
+function updateCounter(){
+  document.getElementById("counter").textContent=
+    "Found: "+foundCount+
+    " / Revealed: "+revealedCount+
+    " / Total: "+triplets.length;
+}
+
+function shuffleTogether(arr1,arr2){
+  for(let i=arr1.length-1;i>0;i--){
+    let j=Math.floor(Math.random()*(i+1));
+    [arr1[i],arr1[j]]=[arr1[j],arr1[i]];
+    [arr2[i],arr2[j]]=[arr2[j],arr2[i]];
+  }
+}
+
+generateGrid();
+</script>
+
+</body>
+</html>
