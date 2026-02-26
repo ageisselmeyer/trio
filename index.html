@@ -83,7 +83,7 @@
 
 <div class="app">
   <h2>Trio</h2>
-  <div id="counter">Gefunden: 0 / Aufgedeckt: 0 / Total: 0</div>
+  <div id="counter">Gefunden: 0 / Aufgedeckt: 0 / Übrig: 0</div>
   <div id="grid"></div>
   <button onclick="revealNext()">Aufdecken</button>
   <button onclick="generateGrid()">Neues Spiel</button>
@@ -229,7 +229,7 @@ function updateCounter(){
   document.getElementById("counter").textContent=
     "Gefunden "+foundCount+
     " / Aufgedeckt: "+revealedCount+
-    " / Total: "+triplets.length;
+    " / Übrig: "+(triplets.length-foundCount-revealedCount);
 }
 
 function shuffleTogether(arr1,arr2){
@@ -245,5 +245,6 @@ generateGrid();
 
 </body>
 </html>
+
 
 
