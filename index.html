@@ -168,15 +168,11 @@ function revealNext(){
       return;
     }
   }
-  alert("All triplets revealed!");
+  alert("Alles aufgedeckt!");
 }
 
 function selectCell(r,c){
   let cell=document.getElementById(`cell-${r}-${c}`);
-
-  // Only block blue revealed cells
-  if(cell.classList.contains("revealed"))
-    return;
 
   cell.classList.toggle("selected");
 
@@ -216,7 +212,7 @@ function markTriplet(triplet,type){
 
     if(type==="found"){
       cell.classList.add("found");
-    } else if(type==="revealed" && !cell.classList.contains("found")){
+    } else if(type==="revealed"){
       cell.classList.add("revealed");
     }
   }
@@ -249,4 +245,5 @@ generateGrid();
 
 </body>
 </html>
+
 
