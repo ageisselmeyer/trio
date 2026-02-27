@@ -69,17 +69,13 @@ body {
   0%   { transform: scale(1); opacity: 1; }
   100% { transform: scale(0); opacity: 0; }
 }
-
-.removing {
-  animation: vanish 0.3s ease forwards;
-}
+.removing { animation: vanish 0.3s ease forwards; }
 
 /* Spark animation */
 @keyframes sparkle {
   0%   { transform: translate(0,0) scale(1); opacity: 1; }
   100% { transform: translate(var(--dx), var(--dy)) scale(0.5); opacity: 0; }
 }
-
 .sparkle {
   position: absolute;
   pointer-events: none;
@@ -92,10 +88,7 @@ body {
   0%, 100% { box-shadow: 0 0 0px rgba(0,255,255,0); }
   50%      { box-shadow: 0 0 12px rgba(0,255,255,0.9); }
 }
-
-.glow {
-  animation: glow 0.8s ease forwards;
-}
+.glow { animation: glow 0.8s ease forwards; }
 
 button {
   padding: 10px 18px;
@@ -108,7 +101,6 @@ button {
   cursor: pointer;
   margin: 5px;
 }
-
 button:active { transform: scale(0.95); }
 </style>
 </head>
@@ -152,7 +144,6 @@ function generateGrid() {
     }
   }
 
-  findTriplets();
   updateCounter();
 }
 
@@ -160,6 +151,7 @@ function isValidTriplet(a,b,c){
   return (a+b===c)||(a+c===b)||(b+c===a);
 }
 
+// Recalculate triplets based on current grid state, ignoring found/revealed/null cells
 function findTriplets(){
   triplets = [];
   const directions=[[0,1],[1,0],[1,1],[1,-1]];
@@ -170,16 +162,15 @@ function findTriplets(){
         let r2=r+dr, c2=c+dc;
         let r3=r+2*dr, c3=c+2*dc;
 
-        if(r3>=0&&r3<size&&c3>=0&&c3<size){
+        if(r3>=0 && r3<size && c3>=0 && c3<size){
           let a=gridData[r][c];
           let b=gridData[r2][c2];
           let cVal=gridData[r3][c3];
 
-          if(a != null && b != null && cVal != null && isValidTriplet(a,b,cVal)){
+          if(a!=null && b!=null && cVal!=null && isValidTriplet(a,b,cVal)){
             const cell1 = document.getElementById(`cell-${r}-${c}`);
             const cell2 = document.getElementById(`cell-${r2}-${c2}`);
             const cell3 = document.getElementById(`cell-${r3}-${c3}`);
-
             if(!cell1.classList.contains("found") && !cell1.classList.contains("revealed") &&
                !cell2.classList.contains("found") && !cell2.classList.contains("revealed") &&
                !cell3.classList.contains("found") && !cell3.classList.contains("revealed")) {
@@ -231,8 +222,7 @@ function removeTriplet(triplet){
   for(let [r,c] of triplet){
     const cell = document.getElementById(`cell-${r}-${c}`);
     cell.classList.remove("selected");
-    cell.classList.add("removing");
-    cell.classList.add("found");
+    cell.classList.add("removing", "found");
 
     for(let i=0;i<5;i++){
       const sparkle = document.createElement("div");
@@ -274,11 +264,13 @@ function clearSelection(){
 }
 
 function updateCounter(){
+  findTriplets(); // recalc to exclude found/revealed
   document.getElementById("counter").textContent=
     "Anzahl: "+triplets.length;
 }
 
 function revealNext(){
+  findTriplets(); // recalc valid remaining trios
   for(let t of triplets){
     if(t.every(([r,c]) => gridData[r][c]!=null)){
       for(let [r,c] of t){
@@ -286,9 +278,7 @@ function revealNext(){
         cell.classList.add("revealed", "glow");
         setTimeout(()=>cell.classList.remove("glow"), 800);
       }
-      // Remove revealed trio from triplets list
-      triplets = triplets.filter(x => x !== t);
-      findTriplets(); // recalc remaining trios
+      findTriplets(); // remove revealed trio from remaining
       updateCounter();
       return;
     }
