@@ -175,8 +175,16 @@ function findTriplets(){
           let b=gridData[r2][c2];
           let cVal=gridData[r3][c3];
 
-          if(a!=null && b!=null && cVal!=null && isValidTriplet(a,b,cVal)){
-            triplets.push([[r,c],[r2,c2],[r3,c3]]);
+          if(a != null && b != null && cVal != null && isValidTriplet(a,b,cVal)){
+            const cell1 = document.getElementById(`cell-${r}-${c}`);
+            const cell2 = document.getElementById(`cell-${r2}-${c2}`);
+            const cell3 = document.getElementById(`cell-${r3}-${c3}`);
+
+            if(!cell1.classList.contains("found") && !cell1.classList.contains("revealed") &&
+               !cell2.classList.contains("found") && !cell2.classList.contains("revealed") &&
+               !cell3.classList.contains("found") && !cell3.classList.contains("revealed")) {
+              triplets.push([[r,c],[r2,c2],[r3,c3]]);
+            }
           }
         }
       }
@@ -224,6 +232,7 @@ function removeTriplet(triplet){
     const cell = document.getElementById(`cell-${r}-${c}`);
     cell.classList.remove("selected");
     cell.classList.add("removing");
+    cell.classList.add("found");
 
     for(let i=0;i<5;i++){
       const sparkle = document.createElement("div");
@@ -233,12 +242,10 @@ function removeTriplet(triplet){
       const appRect = app.getBoundingClientRect();
       sparkle.style.left = (rect.left - appRect.left + 12) + "px";
       sparkle.style.top = (rect.top - appRect.top + 12) + "px";
-
       const dx = (Math.random()*60 - 30) + "px";
       const dy = (Math.random()*60 - 30) + "px";
       sparkle.style.setProperty("--dx", dx);
       sparkle.style.setProperty("--dy", dy);
-
       app.appendChild(sparkle);
       setTimeout(()=>sparkle.remove(), 600);
     }
@@ -253,7 +260,7 @@ function removeTriplet(triplet){
       cell.style.visibility="hidden";
     }
     isAnimating=false;
-    findTriplets();
+    findTriplets(); // recalc remaining trios
     updateCounter();
   },300);
 }
@@ -277,10 +284,11 @@ function revealNext(){
       for(let [r,c] of t){
         const cell=document.getElementById(`cell-${r}-${c}`);
         cell.classList.add("revealed", "glow");
-        // remove glow after animation
         setTimeout(()=>cell.classList.remove("glow"), 800);
       }
+      // Remove revealed trio from triplets list
       triplets = triplets.filter(x => x !== t);
+      findTriplets(); // recalc remaining trios
       updateCounter();
       return;
     }
@@ -291,5 +299,4 @@ function revealNext(){
 generateGrid();
 </script>
 </body>
-
 </html>
