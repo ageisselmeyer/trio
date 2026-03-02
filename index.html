@@ -412,6 +412,7 @@
         if (isAnimating || gridData[r][c] == null) return;
         startTimer();
         const cell = document.getElementById(`cell-${r}-${c}`);
+        if (!cell || cell.classList.contains("found")) return;
         cell.classList.toggle("selected");
         if (cell.classList.contains("selected")) selectedCells.push([r, c]);
         else selectedCells = selectedCells.filter(x => !(x[0] === r && x[1] === c));
@@ -469,7 +470,6 @@
           }
           tripletStatus[index] = "found";
           isAnimating = false;
-          findTriplets();
           updateCounter();
         }, 300);
       }
