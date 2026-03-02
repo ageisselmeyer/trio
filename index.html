@@ -127,6 +127,43 @@
         animation: glow 0.8s ease forwards;
       }
 
+      @keyframes gameOverPop {
+        0% {
+          transform: scale(0.5);
+          opacity: 0;
+        }
+
+        40% {
+          transform: scale(1.1);
+          opacity: 1;
+        }
+
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+
+      .game-over-message {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: auto;
+        background: radial-gradient(circle at center, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.4));
+        cursor: pointer;
+      }
+
+      .game-over-message span {
+        font-size: 28px;
+        font-weight: 800;
+        color: #1cc88a;
+        text-shadow: 0 0 15px rgba(76, 175, 80, 0.8);
+        letter-spacing: 1px;
+        animation: gameOverPop 0.7s ease-out forwards;
+      }
+
       button {
         padding: 10px 18px;
         border: none;
@@ -164,7 +201,8 @@
         isAnimating = false,
         timerSeconds = 0,
         timerInterval = null,
-        timerStarted = false;
+        timerStarted = false,
+        gameOverShown = false;
 
       function startTimer() {
         if (timerStarted) return;
@@ -196,6 +234,7 @@
         tripletStatus = [];
         selectedCells = [];
         isAnimating = false;
+        gameOverShown = false;
         stopTimer();
         for (let r = 0; r < size; r++) {
           gridData[r] = [];
@@ -328,7 +367,27 @@
         const remaining = tripletStatus.filter((s, i) => s === "hidden" && triplets[i].every(([r, c]) => gridData[r][c] != null));
         const countEl = document.getElementById("countValue");
         if (countEl) countEl.textContent = String(remaining.length);
-        if (remaining.length === 0) stopTimer();
+        if (remaining.length === 0) {
+          stopTimer();
+          showGameOver();
+        }
+      }
+
+      function showGameOver() {
+        if (gameOverShown) return;
+        gameOverShown = true;
+        const app = document.querySelector(".app");
+        if (!app) return;
+        const overlay = document.createElement("div");
+        overlay.className = "game-over-message";
+        const label = document.createElement("span");
+        label.textContent = "Geschafft! 🎉";
+        overlay.appendChild(label);
+        app.appendChild(overlay);
+        overlay.addEventListener("click", () => {
+          overlay.remove();
+          generateGrid();
+        });
       }
 
       function revealNext() {
