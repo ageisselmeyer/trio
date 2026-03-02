@@ -349,6 +349,9 @@
         isAnimating = false;
         gameOverShown = false;
         stopTimer();
+        timerSeconds = 0;
+        const timeEl = document.getElementById("timeValue");
+        if (timeEl) timeEl.textContent = "0";
         for (let r = 0; r < size; r++) {
           gridData[r] = [];
           for (let c = 0; c < size; c++) {
@@ -522,7 +525,7 @@
         modal.className = "help-modal";
         modal.innerHTML = `
           <h3>Wie funktioniert Trio?</h3>
-          <p>Finde Dreier-Kombinationen, bei denen zwei Zahlen zusammen die dritte ergeben.</p>
+          <p>Finde alle Dreier-Kombinationen, bei denen zwei Zahlen zusammen die dritte ergeben.</p>
           <ul>
             <li>Tippe nacheinander <strong>drei</strong> benachbarte Felder an (horizontal / vertikal / diagonal), um ein Trio zu wählen.</li>
             <li>Ist es ein gültiges Trio, verschwinden die Felder mit einem Effekt.</li>
