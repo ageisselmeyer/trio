@@ -77,7 +77,6 @@
       }
 
       .found {
-        background: darkgreen;
         color: white;
       }
 
@@ -386,9 +385,11 @@
           for (let [r, c] of t) {
             gridData[r][c] = null;
             const cell = document.getElementById(`cell-${r}-${c}`);
+            if (!cell) continue;
             cell.textContent = "";
-            cell.classList.remove("removing");
             cell.style.visibility = "hidden";
+            cell.style.opacity = "0";
+            cell.classList.remove("removing");
           }
           tripletStatus[index] = "found";
           isAnimating = false;
