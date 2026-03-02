@@ -147,7 +147,10 @@
   <body>
     <div class="app">
       <h2>Trio</h2>
-      <div id="counter">Anzahl: 0</div>
+      <div id="counter">
+        Anzahl: <span id="countValue">0</span>
+        &nbsp;&nbsp;&nbsp;Zeit: <span id="timeValue">0</span>s
+      </div>
       <div id="grid"></div>
       <button onclick="revealNext()">Aufdecken</button>
       <button onclick="generateGrid()">Neues Spiel</button>
@@ -158,7 +161,32 @@
         triplets = [],
         tripletStatus = [],
         selectedCells = [],
-        isAnimating = false;
+        isAnimating = false,
+        timerSeconds = 0,
+        timerInterval = null,
+        timerStarted = false;
+
+      function startTimer() {
+        if (timerStarted) return;
+        timerStarted = true;
+        if (timerInterval) clearInterval(timerInterval);
+        timerSeconds = 0;
+        const timeEl = document.getElementById("timeValue");
+        if (timeEl) timeEl.textContent = "0";
+        timerInterval = setInterval(() => {
+          timerSeconds++;
+          const timeElTick = document.getElementById("timeValue");
+          if (timeElTick) timeElTick.textContent = String(timerSeconds);
+        }, 1000);
+      }
+
+      function stopTimer() {
+        if (timerInterval) {
+          clearInterval(timerInterval);
+          timerInterval = null;
+        }
+        timerStarted = false;
+      }
 
       function generateGrid() {
         const grid = document.getElementById("grid");
@@ -168,6 +196,7 @@
         tripletStatus = [];
         selectedCells = [];
         isAnimating = false;
+        stopTimer();
         for (let r = 0; r < size; r++) {
           gridData[r] = [];
           for (let c = 0; c < size; c++) {
@@ -225,6 +254,7 @@
 
       function selectCell(r, c) {
         if (isAnimating || gridData[r][c] == null) return;
+        startTimer();
         const cell = document.getElementById(`cell-${r}-${c}`);
         cell.classList.toggle("selected");
         if (cell.classList.contains("selected")) selectedCells.push([r, c]);
@@ -296,7 +326,9 @@
 
       function updateCounter() {
         const remaining = tripletStatus.filter((s, i) => s === "hidden" && triplets[i].every(([r, c]) => gridData[r][c] != null));
-        document.getElementById("counter").textContent = "Anzahl: " + remaining.length;
+        const countEl = document.getElementById("countValue");
+        if (countEl) countEl.textContent = String(remaining.length);
+        if (remaining.length === 0) stopTimer();
       }
 
       function revealNext() {
