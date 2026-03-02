@@ -138,7 +138,7 @@
       }
 
       .border-1 {
-        border-color: #ffeb3b;
+        border-color: #f44336;
       }
 
       .border-2 {
@@ -146,7 +146,7 @@
       }
 
       .border-3 {
-        border-color: #f44336;
+        border-color: #ffeb3b;
       }
 
       .border-4 {
@@ -154,15 +154,15 @@
       }
 
       .border-5 {
-        border-color: #2196f3;
-      }
-
-      .border-6 {
         border-color: #00bcd4;
       }
 
-      .border-7 {
+      .border-6 {
         border-color: #006400;
+      }
+
+      .border-7 {
+        border-color: #2196f3;
       }
 
       .border-8 {
@@ -358,7 +358,7 @@
             let num = Math.floor(Math.random() * 9) + 1;
             gridData[r][c] = num;
             const cell = document.createElement("div");
-            const borderIndex = Math.floor(Math.random() * 9) + 1;
+            const borderIndex = Math.floor(Math.random() * 9) + 1; //use num for fixed colors
             cell.className = `cell border-${borderIndex}`;
             cell.id = `cell-${r}-${c}`;
             cell.textContent = num;
@@ -524,13 +524,13 @@
         const modal = document.createElement("div");
         modal.className = "help-modal";
         modal.innerHTML = `
-          <h3>Wie funktioniert Trio?</h3>
+          <h3>Spielanleitung</h3>
           <p>Finde alle Dreier-Kombinationen, bei denen zwei Zahlen zusammen die dritte ergeben.</p>
           <ul>
-            <li>Tippe nacheinander <strong>drei</strong> benachbarte Felder an (horizontal / vertikal / diagonal), um ein Trio zu wählen.</li>
-            <li>Ist es ein gültiges Trio, verschwinden die Felder mit einem Effekt.</li>
+            <li>Tippe nacheinander <strong>drei</strong> benachbarte Felder an (horizontal / vertikal / diagonal), um ein Trio auszuwählen.</li>
+            <li>Hast du alles richtig gemacht, dann verschwinden die Felder.</li>
             <li>Mit <strong>Aufdecken</strong> kannst du dir ein noch verstecktes Trio anzeigen lassen.</li>
-            <li>Mit <strong>Neues Spiel</strong> startest du jederzeit neu.</li>
+            <li>Beispiel: 374 ist ein Trio, weil 3 + 4 = 7.</li>
           </ul>
           <button class="help-modal-close" onclick="closeHelp()">Verstanden</button>
         `;
