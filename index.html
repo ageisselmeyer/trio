@@ -35,14 +35,29 @@
       }
 
       .app {
-        padding: 20px;
+        --board-size: min(100%, calc(100vh - 220px));
+        --tile-border: 4px;
+        --tile-font-size: 18px;
+        --title-font-size: 44px;
+        --counter-font-size: 20px;
+        --button-font-size: 22px;
+        width: min(96vw, 900px);
+        padding: 12px;
+        box-sizing: border-box;
         text-align: center;
-        width: 360px;
         position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      h2 {
+        font-size: var(--title-font-size);
+        margin: 0 0 10px;
       }
 
       #counter {
-        font-size: 14px;
+        font-size: var(--counter-font-size);
         margin-bottom: 15px;
         font-weight: 600;
         color: #555;
@@ -50,23 +65,25 @@
 
       #grid {
         display: grid;
-        grid-template-columns: repeat(7, 46px);
-        gap: 6px;
+        width: var(--board-size);
+        aspect-ratio: 1 / 1;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        gap: clamp(4px, 1vw, 10px);
         justify-content: center;
         margin-bottom: 20px;
       }
 
       .cell {
-        width: 46px;
-        height: 46px;
+        width: 100%;
+        aspect-ratio: 1 / 1;
         box-sizing: border-box;
         border-radius: 10px;
         background: #ffffff;
-        border: 4px solid #ffffff;
+        border: var(--tile-border) solid #ffffff;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 18px;
+        font-size: var(--tile-font-size);
         font-weight: 600;
         box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
         transition: 0.2s;
@@ -213,7 +230,7 @@
       .help-button {
         position: absolute;
         top: 10px;
-        right: 10px;
+        right: calc((100% - var(--board-size)) / 2 + 6px);
         width: 30px;
         height: 30px;
         border-radius: 50%;
@@ -282,10 +299,23 @@
         border-radius: 12px;
         background: #4e73df;
         color: white;
-        font-size: 15px;
+        font-size: var(--button-font-size);
         font-weight: 600;
         cursor: pointer;
-        margin: 5px;
+        margin: 6px 4px 0;
+      }
+
+      .controls {
+        width: var(--board-size);
+        max-width: 100%;
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin: 0 auto;
+      }
+
+      .controls button {
+        margin: 0;
       }
 
       button:active {
@@ -302,8 +332,10 @@
         &nbsp;&nbsp;&nbsp;Zeit: <span id="timeValue">0</span>s
       </div>
       <div id="grid"></div>
-      <button onclick="revealNext()">Aufdecken</button>
-      <button onclick="generateGrid()">Neues Spiel</button>
+      <div class="controls">
+        <button onclick="revealNext()">Aufdecken</button>
+        <button onclick="generateGrid()">Neues Spiel</button>
+      </div>
     </div>
     <script>
       let size = 7,
@@ -368,6 +400,25 @@
         }
         findTriplets();
         updateCounter();
+        updateTileBorderThickness();
+      }
+
+      function updateTileBorderThickness() {
+        const app = document.querySelector(".app");
+        const grid = document.getElementById("grid");
+        if (!app || !grid) return;
+        const boardSize = grid.clientWidth;
+        const borderPx = Math.max(3, Math.min(8, boardSize * 0.012));
+        const tileSize = boardSize / 7;
+        const fontPx = Math.max(15, Math.min(34, tileSize * 0.40));
+        const titlePx = Math.max(22, Math.min(36, tileSize * 0.60));
+        const counterPx = Math.max(12, Math.min(19, tileSize * 0.27));
+        const buttonPx = Math.max(12, Math.min(17, tileSize * 0.27));
+        app.style.setProperty("--tile-border", `${borderPx}px`);
+        app.style.setProperty("--tile-font-size", `${fontPx}px`);
+        app.style.setProperty("--title-font-size", `${titlePx}px`);
+        app.style.setProperty("--counter-font-size", `${counterPx}px`);
+        app.style.setProperty("--button-font-size", `${buttonPx}px`);
       }
 
       function isValidTriplet(a, b, c) {
@@ -525,9 +576,9 @@
         modal.className = "help-modal";
         modal.innerHTML = `
           <h3>Spielanleitung</h3>
-          <p>Finde alle Trios, also Dreiergruppen, bei denen zwei Zahlen zusammen die dritte ergeben.</p>
+          <p>Finde alle Trios, also Dreiergruppen, bei denen zwei Zahlen zusammen die dritte ergeben.<br>
+            <strong>Beispiel:</strong> 374 ist ein Trio, weil 3 + 4 = 7.</p>
           <ul>
-            <li>Beispiel: 374 ist ein Trio, weil 3 + 4 = 7.</li>
             <li>Tippe nacheinander <strong>drei benachbarte Felder</strong> an (horizontal / vertikal / diagonal), um ein Trio auszuwählen.</li>
             <li>Hast du alles richtig gemacht, dann verschwinden die drei Felder.</li>
             <li>Mit <strong>Aufdecken</strong> kannst du dir ein noch verstecktes Trio anzeigen lassen.</li>
@@ -558,6 +609,8 @@
         }
         alert("Alles aufgedeckt!");
       }
+
+      window.addEventListener("resize", updateTileBorderThickness);
       generateGrid();
     </script>
   </body>
