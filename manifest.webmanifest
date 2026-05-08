@@ -1,0 +1,17 @@
+{
+  "name": "Trio",
+  "short_name": "Trio",
+  "description": "Finde Zahlen-Trios im 7x7 Raster.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#e8dcc8",
+  "theme_color": "#e8dcc8",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
