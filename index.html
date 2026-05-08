@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#e8dcc8">
+    <meta name="theme-color" content="#efe1cc">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Trio">
     <link rel="manifest" href="manifest.webmanifest">
@@ -26,10 +26,7 @@
       body {
         margin: 0;
         font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-        background: #6b4a2b url("bg.jpg");
-        background-size: cover;
-        background-position: center;
-        background-repeat: repeat;
+        background: #efe1cc;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -37,6 +34,16 @@
         -webkit-touch-callout: none;
         user-select: none;
         touch-action: manipulation;
+      }
+
+      .wood-bg {
+        position: fixed;
+        inset: 0;
+        background: #6b4a2b url("bg.jpg");
+        background-size: cover;
+        background-position: center;
+        background-repeat: repeat;
+        z-index: -1;
       }
 
       .app {
@@ -329,6 +336,7 @@
     </style>
   </head>
   <body>
+    <div class="wood-bg" aria-hidden="true"></div>
     <div class="app">
       <button class="help-button" onclick="openHelp()">?</button>
       <h2>Trio</h2>

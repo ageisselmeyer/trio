@@ -4,8 +4,8 @@
   "description": "Finde Zahlen-Trios im 7x7 Raster.",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#e8dcc8",
-  "theme_color": "#e8dcc8",
+  "background_color": "#efe1cc",
+  "theme_color": "#efe1cc",
   "icons": [
     {
       "src": "icon.svg",
