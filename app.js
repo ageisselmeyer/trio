@@ -1,5 +1,13 @@
-let size = 7,
-  gridData = [],
+const MIN_GRID_SIDE = 3;
+const MAX_GRID_SIDE = 20;
+/** Fixed tile and gap (px) so layout does not feed back through changing measurements. */
+const TILE_SIZE_PX = 60;
+const GRID_GAP_PX = 10;
+
+let gridCols = 5;
+let gridRows = 7;
+
+let gridData = [],
   triplets = [],
   tripletStatus = [],
   selectedCells = [],
@@ -8,6 +16,92 @@ let size = 7,
   timerInterval = null,
   timerStarted = false,
   gameOverShown = false;
+
+function maxUnitsAlong(edgePx) {
+  return Math.floor((edgePx + GRID_GAP_PX) / (TILE_SIZE_PX + GRID_GAP_PX));
+}
+
+/** How many tiles fit along one edge, clamped to [MIN, MAX] (overflow uses MIN if cap is too small). */
+function fitUnitsAlong(edgePx) {
+  const cap = maxUnitsAlong(edgePx);
+  if (cap >= MIN_GRID_SIDE) return Math.min(MAX_GRID_SIDE, cap);
+  return MIN_GRID_SIDE;
+}
+
+/**
+ * Columns depend only on available width; rows only on height. Resizing one axis no longer
+ * jumps between distant aspect-matched pairs (e.g. 12×20 ↔ 10×17).
+ */
+function computeGridDimensions(availW, availH) {
+  return {
+    cols: fitUnitsAlong(availW),
+    rows: fitUnitsAlong(availH)
+  };
+}
+
+function updateGridSizeLabel() {
+  const el = document.getElementById("gridSizeValue");
+  if (el) el.textContent = `${gridRows}×${gridCols}`;
+}
+
+function applyBoardLayout() {
+  const app = document.querySelector(".app");
+  const area = document.querySelector(".board-area");
+  if (!app || !area) return;
+
+  const pad = 8;
+  const W = Math.max(80, area.clientWidth - pad);
+  const H = Math.max(80, area.clientHeight - pad);
+
+  const { cols, rows } = computeGridDimensions(W, H);
+  const g = GRID_GAP_PX;
+  const boardW = cols * TILE_SIZE_PX + (cols - 1) * g;
+  const boardH = rows * TILE_SIZE_PX + (rows - 1) * g;
+
+  const prevCols = gridCols;
+  const prevRows = gridRows;
+  gridCols = cols;
+  gridRows = rows;
+  updateGridSizeLabel();
+
+  app.style.setProperty("--grid-cols", String(cols));
+  app.style.setProperty("--grid-rows", String(rows));
+  app.style.setProperty("--board-size", `${boardW}px`);
+  app.style.setProperty("--board-height", `${boardH}px`);
+
+  const dimsChanged = cols !== prevCols || rows !== prevRows;
+  const gridEl = document.getElementById("grid");
+  const needsNewGrid = dimsChanged || !gridEl || gridEl.childElementCount === 0;
+
+  if (needsNewGrid) {
+    generateGrid();
+  }
+}
+
+let layoutDebounce = null;
+function scheduleBoardLayout() {
+  clearTimeout(layoutDebounce);
+  layoutDebounce = setTimeout(() => {
+    applyBoardLayout();
+    layoutDebounce = null;
+  }, 60);
+}
+
+function initBoardLayout() {
+  const area = document.querySelector(".board-area");
+  if (!area) return;
+
+  const ro = new ResizeObserver(() => scheduleBoardLayout());
+  ro.observe(area);
+
+  const run = () => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(applyBoardLayout);
+    });
+  };
+  run();
+  window.addEventListener("resize", scheduleBoardLayout);
+}
 
 function startTimer() {
   if (timerStarted) return;
@@ -44,9 +138,9 @@ function generateGrid() {
   timerSeconds = 0;
   const timeEl = document.getElementById("timeValue");
   if (timeEl) timeEl.textContent = "0";
-  for (let r = 0; r < size; r++) {
+  for (let r = 0; r < gridRows; r++) {
     gridData[r] = [];
-    for (let c = 0; c < size; c++) {
+    for (let c = 0; c < gridCols; c++) {
       let num = Math.floor(Math.random() * 9) + 1;
       gridData[r][c] = num;
       const cell = document.createElement("div");
@@ -60,25 +154,6 @@ function generateGrid() {
   }
   findTriplets();
   updateCounter();
-  updateTileBorderThickness();
-}
-
-function updateTileBorderThickness() {
-  const app = document.querySelector(".app");
-  const grid = document.getElementById("grid");
-  if (!app || !grid) return;
-  const boardSize = grid.clientWidth;
-  const borderPx = Math.max(3, Math.min(8, boardSize * 0.012));
-  const tileSize = boardSize / 7;
-  const fontPx = Math.max(14, Math.min(32, tileSize * 0.37));
-  const titlePx = Math.max(22, Math.min(36, tileSize * 0.60));
-  const counterPx = Math.max(12, Math.min(19, tileSize * 0.27));
-  const buttonPx = Math.max(12, Math.min(17, tileSize * 0.27));
-  app.style.setProperty("--tile-border", `${borderPx}px`);
-  app.style.setProperty("--tile-font-size", `${fontPx}px`);
-  app.style.setProperty("--title-font-size", `${titlePx}px`);
-  app.style.setProperty("--counter-font-size", `${counterPx}px`);
-  app.style.setProperty("--button-font-size", `${buttonPx}px`);
 }
 
 function isValidTriplet(a, b, c) {
@@ -94,14 +169,14 @@ function findTriplets() {
     [1, 1],
     [1, -1]
   ];
-  for (let r = 0; r < size; r++) {
-    for (let c = 0; c < size; c++) {
+  for (let r = 0; r < gridRows; r++) {
+    for (let c = 0; c < gridCols; c++) {
       for (let [dr, dc] of dirs) {
         let r2 = r + dr,
           c2 = c + dc,
           r3 = r + 2 * dr,
           c3 = c + 2 * dc;
-        if (r3 >= 0 && r3 < size && c3 >= 0 && c3 < size) {
+        if (r3 >= 0 && r3 < gridRows && c3 >= 0 && c3 < gridCols) {
           let a = gridData[r][c],
             b = gridData[r2][c2],
             cVal = gridData[r3][c3];
@@ -270,5 +345,4 @@ function revealNext() {
   alert("Alles aufgedeckt!");
 }
 
-window.addEventListener("resize", updateTileBorderThickness);
-generateGrid();
+initBoardLayout();
