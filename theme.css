@@ -27,6 +27,9 @@ body {
 }
 
 .app {
+  --app-inset: 4px;
+  --controls-stack-gap: 20px;
+  --controls-bottom-gap: 24px;
   --board-size: min(96vw, 360px);
   --board-height: 480px;
   --grid-cols: 5;
@@ -41,7 +44,7 @@ body {
   margin: 0 auto;
   min-height: 100dvh;
   max-height: 100dvh;
-  padding: 12px 4px;
+  padding: var(--app-inset) var(--app-inset) calc(var(--app-inset) + var(--controls-bottom-gap));
   box-sizing: border-box;
   text-align: center;
   position: relative;
@@ -83,7 +86,6 @@ h2 {
   grid-template-rows: repeat(var(--grid-rows), minmax(0, 1fr));
   gap: var(--grid-gap);
   justify-content: center;
-  margin-bottom: 20px;
   flex-shrink: 0;
 }
 
@@ -325,7 +327,7 @@ button {
   display: flex;
   justify-content: center;
   gap: 8px;
-  margin: 0 auto 20px;
+  margin: var(--controls-stack-gap) auto 0;
   flex-shrink: 0;
 }
 
