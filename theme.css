@@ -37,11 +37,11 @@ body {
   --title-font-size: 32px;
   --counter-font-size: 16px;
   --button-font-size: 16px;
-  width: min(96vw, 1680px);
+  width: min(98vw, 1680px);
   margin: 0 auto;
   min-height: 100dvh;
   max-height: 100dvh;
-  padding: 12px;
+  padding: 12px 6px;
   box-sizing: border-box;
   text-align: center;
   position: relative;
