@@ -44,7 +44,8 @@ body {
   margin: 0 auto;
   min-height: 100dvh;
   max-height: 100dvh;
-  padding: var(--app-inset) var(--app-inset) calc(var(--app-inset) + var(--controls-bottom-gap));
+  padding: max(var(--app-inset), env(safe-area-inset-top, 0px)) var(--app-inset)
+    calc(var(--app-inset) + var(--controls-bottom-gap) + env(safe-area-inset-bottom, 0px));
   box-sizing: border-box;
   text-align: center;
   position: relative;
