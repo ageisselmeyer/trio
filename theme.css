@@ -41,7 +41,7 @@ body {
   margin: 0 auto;
   min-height: 100dvh;
   max-height: 100dvh;
-  padding: 12px 6px;
+  padding: 12px 4px;
   box-sizing: border-box;
   text-align: center;
   position: relative;
@@ -325,7 +325,7 @@ button {
   display: flex;
   justify-content: center;
   gap: 8px;
-  margin: 0 auto;
+  margin: 0 auto 20px;
   flex-shrink: 0;
 }
 
