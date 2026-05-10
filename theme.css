@@ -245,8 +245,9 @@ h2 {
 
 .help-button {
   position: absolute;
-  top: 10px;
-  right: calc((100% - var(--board-size)) / 2 + 6px);
+  top: var(--app-inset);
+  right: calc((100% - var(--board-size)) / 2);
+  z-index: 5;
   width: 30px;
   height: 30px;
   border-radius: 50%;
