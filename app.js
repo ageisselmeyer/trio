@@ -101,6 +101,10 @@ function initBoardLayout() {
   };
   run();
   window.addEventListener("resize", scheduleBoardLayout);
+  window.addEventListener("orientationchange", scheduleBoardLayout);
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", scheduleBoardLayout);
+  }
 }
 
 function startTimer() {

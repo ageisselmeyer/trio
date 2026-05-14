@@ -43,7 +43,7 @@ body {
   width: min(98vw, 1680px);
   margin: 0 auto;
   min-height: 100dvh;
-  max-height: 100dvh;
+  /* Omit max-height: 100dvh — after rotation iOS can keep dvh shorter than the painted viewport (gap below). */
   padding: max(var(--app-inset), env(safe-area-inset-top, 0px)) var(--app-inset)
     calc(var(--app-inset) + var(--controls-bottom-gap) + env(safe-area-inset-bottom, 0px));
   box-sizing: border-box;
@@ -246,8 +246,9 @@ h2 {
 
 .help-button {
   position: absolute;
-  top: var(--app-inset);
-  right: calc((100% - var(--board-size)) / 2);
+  /* Same vertical origin as in-flow content (matches .app padding-top) so ? lines up with “Trio”. */
+  top: max(var(--app-inset), env(safe-area-inset-top, 0px));
+  right: calc(env(safe-area-inset-right, 0px) + (100% - var(--board-size)) / 2);
   z-index: 5;
   width: 30px;
   height: 30px;
