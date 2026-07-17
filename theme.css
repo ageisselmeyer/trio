@@ -267,6 +267,7 @@ h2 {
 .game-over-message {
   position: absolute;
   inset: 0;
+  z-index: 15;
   display: flex;
   align-items: center;
   justify-content: center;
