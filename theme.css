@@ -7,19 +7,10 @@
   :root {
     --bottom-bar-gap: 0px;
   }
-
-  html,
-  body {
-    bottom: calc(-1 * env(safe-area-inset-bottom, 0px));
-  }
 }
 
 html {
-  background-color: #6b4a2b;
-  background-image: url("bg.jpg");
-  background-size: cover;
-  background-position: center;
-  background-repeat: repeat;
+  background-color: #efe1cc;
   position: fixed;
   inset: 0;
   width: 100%;
@@ -49,6 +40,17 @@ body {
   padding: 0 env(safe-area-inset-right, 0px) 0 env(safe-area-inset-left, 0px);
 }
 
+.wood-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: calc(100lvh + env(safe-area-inset-bottom, 0px));
+  background: #efe1cc url("bg.jpg") center / cover no-repeat;
+  z-index: 0;
+  pointer-events: none;
+}
+
 .app {
   --board-size: min(96vw, 360px);
   --board-height: 480px;
@@ -68,6 +70,7 @@ body {
   width: 100%;
   max-width: min(98vw, 1680px);
   margin-inline: auto;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   overflow: hidden;
