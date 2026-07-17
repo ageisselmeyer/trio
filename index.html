@@ -16,6 +16,15 @@
     <meta http-equiv="Expires" content="0" />
     <title>Trio</title>
     <link rel="stylesheet" href="theme.css">
+    <script>
+      if (
+        window.matchMedia("(display-mode: standalone)").matches ||
+        window.matchMedia("(display-mode: fullscreen)").matches ||
+        window.navigator.standalone
+      ) {
+        document.documentElement.classList.add("standalone");
+      }
+    </script>
   </head>
   <body>
     <div id="app" class="app">

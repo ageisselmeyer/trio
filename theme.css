@@ -1,18 +1,10 @@
 :root {
+  /* Safari tab: space under buttons; no home-indicator floor. */
   --bottom-bar-gap: 24px;
   --bottom-safe: 0px;
 }
 
-@media (display-mode: standalone), (display-mode: fullscreen) {
-  :root {
-    /* iOS 26 often under-reports env(bottom); keep a floor so wood footer reaches the edge. */
-    --bottom-bar-gap: 0px;
-    --bottom-safe: max(34px, env(safe-area-inset-bottom, 0px));
-  }
-}
-
 html {
-  height: 100%;
   overflow: hidden;
   overscroll-behavior: none;
   background-color: #efe1cc;
@@ -21,6 +13,10 @@ html {
   background-position: center;
   background-repeat: no-repeat;
   background-attachment: fixed;
+  /* Browser default: fixed shell stays inside Safari’s visual viewport. */
+  position: fixed;
+  inset: 0;
+  width: 100%;
 }
 
 * {
@@ -30,9 +26,9 @@ html {
 
 body {
   margin: 0;
-  min-height: 100%;
-  min-height: 100vh;
-  height: 100%;
+  position: fixed;
+  inset: 0;
+  width: 100%;
   overflow: hidden;
   overscroll-behavior: none;
   font-family: -apple-system, BlinkMacSystemFont, sans-serif;
@@ -59,16 +55,73 @@ body {
   visibility: hidden;
   opacity: 0;
   transition: opacity 200ms linear;
-  position: relative;
+  position: fixed;
+  inset: 0;
   width: 100%;
   max-width: min(98vw, 1680px);
   margin-inline: auto;
-  height: 100%;
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   text-align: center;
+}
+
+/*
+ * Installed PWA: unfixed roots + wood footer (verified iOS 26).
+ * Do not apply this shell to Safari tabs — content sits under the toolbar.
+ */
+@media (display-mode: standalone), (display-mode: fullscreen) {
+  :root {
+    --bottom-bar-gap: 0px;
+    --bottom-safe: max(34px, env(safe-area-inset-bottom, 0px));
+  }
+
+  html {
+    position: static;
+    height: 100%;
+    width: auto;
+    inset: auto;
+  }
+
+  body {
+    position: static;
+    inset: auto;
+    width: auto;
+    height: 100%;
+    min-height: 100vh;
+  }
+
+  .app {
+    position: relative;
+    inset: auto;
+    height: 100%;
+    min-height: 100vh;
+  }
+}
+
+/* iOS legacy Home Screen flag (complements display-mode). */
+html.standalone {
+  --bottom-bar-gap: 0px;
+  --bottom-safe: max(34px, env(safe-area-inset-bottom, 0px));
+  position: static;
+  height: 100%;
+  width: auto;
+  inset: auto;
+}
+
+html.standalone body {
+  position: static;
+  inset: auto;
+  width: auto;
+  height: 100%;
+  min-height: 100vh;
+}
+
+html.standalone .app {
+  position: relative;
+  inset: auto;
+  height: 100%;
+  min-height: 100vh;
 }
 
 .app.ready {
