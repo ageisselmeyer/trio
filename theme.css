@@ -10,11 +10,7 @@
 }
 
 html {
-  background-color: #6b4a2b;
-  background-image: url("bg.jpg");
-  background-size: 100% auto;
-  background-position: top center;
-  background-repeat: repeat-y;
+  background-color: #efe1cc;
   position: fixed;
   inset: 0;
   width: 100%;
@@ -46,13 +42,8 @@ body {
 
 .wood-bg {
   position: fixed;
-  /* Oversized so home-indicator / status-bar bands stay wood, not cream. */
-  inset: -120px;
-  background-color: #6b4a2b;
-  background-image: url("bg.jpg");
-  background-size: cover;
-  background-position: center;
-  background-repeat: repeat;
+  inset: 0;
+  background: #efe1cc url("bg.jpg") center / cover no-repeat;
   z-index: 0;
   pointer-events: none;
 }
