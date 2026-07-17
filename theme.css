@@ -7,10 +7,19 @@
   :root {
     --bottom-bar-gap: 0px;
   }
+
+  html,
+  body {
+    bottom: calc(-1 * env(safe-area-inset-bottom, 0px));
+  }
 }
 
 html {
-  background-color: #efe1cc;
+  background-color: #6b4a2b;
+  background-image: url("bg.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: repeat;
   position: fixed;
   inset: 0;
   width: 100%;
@@ -31,23 +40,13 @@ body {
   overflow: hidden;
   overscroll-behavior: none;
   font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-  background: #efe1cc;
+  background: transparent;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
   user-select: none;
   touch-action: manipulation;
   -webkit-text-size-adjust: 100%;
   padding: 0 env(safe-area-inset-right, 0px) 0 env(safe-area-inset-left, 0px);
-}
-
-.wood-bg {
-  position: fixed;
-  inset: 0;
-  background: #6b4a2b url("bg.jpg");
-  background-size: cover;
-  background-position: center;
-  background-repeat: repeat;
-  z-index: -1;
 }
 
 .app {
