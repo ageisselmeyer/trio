@@ -19,21 +19,29 @@
   </head>
   <body>
     <div class="wood-bg" aria-hidden="true"></div>
-    <div class="app">
-      <button class="help-button" onclick="openHelp()">?</button>
-      <h2>Trio</h2>
-      <div id="counter">
-        Anzahl: <span id="countValue">0</span>
-        &nbsp;&nbsp;&nbsp;Zeit: <span id="timeValue">0</span>s
-        &nbsp;&nbsp;&nbsp;Gitter: <span id="gridSizeValue">—</span>
-      </div>
-      <div class="board-area">
-        <div id="grid"></div>
-      </div>
-      <div class="controls">
-        <button onclick="revealNext()">Aufdecken</button>
-        <button onclick="generateGrid()">Neues Spiel</button>
-      </div>
+    <div id="app" class="app">
+      <header class="app-header">
+        <div class="header-board">
+          <h2>Trio</h2>
+          <button class="help-button" type="button" onclick="openHelp()">?</button>
+        </div>
+        <div id="counter">
+          Anzahl: <span id="countValue">0</span>
+          &nbsp;&nbsp;&nbsp;Zeit: <span id="timeValue">0</span>s
+          &nbsp;&nbsp;&nbsp;Gitter: <span id="gridSizeValue">—</span>
+        </div>
+      </header>
+
+      <main class="app-scroll">
+        <div class="board-area">
+          <div id="grid"></div>
+        </div>
+      </main>
+
+      <nav class="bottom-bar" aria-label="Spielaktionen">
+        <button type="button" onclick="revealNext()">Aufdecken</button>
+        <button type="button" onclick="generateGrid()">Neues Spiel</button>
+      </nav>
     </div>
     <script src="app.js" defer></script>
   </body>

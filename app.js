@@ -46,12 +46,15 @@ function updateGridSizeLabel() {
 
 function applyBoardLayout() {
   const app = document.querySelector(".app");
-  const area = document.querySelector(".board-area");
-  if (!app || !area) return;
+  const scroll = document.querySelector(".app-scroll");
+  if (!app || !scroll) return;
 
-  const pad = 8;
-  const W = Math.max(80, area.clientWidth - pad);
-  const H = Math.max(80, area.clientHeight - pad);
+  const styles = getComputedStyle(scroll);
+  const padTop = parseFloat(styles.paddingTop) || 0;
+  const padBottom = parseFloat(styles.paddingBottom) || 0;
+  const pad = 16;
+  const W = Math.max(80, scroll.clientWidth - pad);
+  const H = Math.max(80, scroll.clientHeight - padTop - padBottom - pad);
 
   const { cols, rows } = computeGridDimensions(W, H);
   const g = GRID_GAP_PX;
@@ -88,11 +91,11 @@ function scheduleBoardLayout() {
 }
 
 function initBoardLayout() {
-  const area = document.querySelector(".board-area");
-  if (!area) return;
+  const scroll = document.querySelector(".app-scroll");
+  if (!scroll) return;
 
   const ro = new ResizeObserver(() => scheduleBoardLayout());
-  ro.observe(area);
+  ro.observe(scroll);
 
   const run = () => {
     requestAnimationFrame(() => {
@@ -315,13 +318,11 @@ function openHelp() {
   modal.className = "help-modal";
   modal.innerHTML = `
           <h3>Spielanleitung</h3>
-          <p>Finde alle Trios, also Dreiergruppen, bei denen zwei Zahlen zusammen die dritte ergeben.<br>
-            <strong>Beispiel:</strong> 374 ist ein Trio, weil 3 + 4 = 7.</p>
-          <ul>
-            <li>Tippe nacheinander <strong>drei benachbarte Felder</strong> an (horizontal / vertikal / diagonal), um ein Trio auszuwählen.</li>
-            <li>Hast du alles richtig gemacht, dann verschwinden die drei Felder.</li>
-            <li>Mit <strong>Aufdecken</strong> kannst du dir ein noch verstecktes Trio anzeigen lassen.</li>
-          </ul>
+          <p>Finde alle Trios, also Dreiergruppen, bei denen zwei Zahlen zusammen die dritte ergeben.</p>
+          <p><strong>Beispiel:</strong> 374 ist ein Trio, weil 3 + 4 = 7.</p>
+          <p>Tippe nacheinander <strong>drei benachbarte Felder</strong> an (horizontal / vertikal / diagonal), um ein Trio auszuwählen.</p>
+          <p>Hast du alles richtig gemacht, dann verschwinden die drei Felder.</p>
+          <p>Mit <strong>Aufdecken</strong> kannst du dir ein noch verstecktes Trio anzeigen lassen.</p>
           <button class="help-modal-close" onclick="closeHelp()">Verstanden</button>
         `;
   backdrop.appendChild(modal);
@@ -349,4 +350,52 @@ function revealNext() {
   alert("Alles aufgedeckt!");
 }
 
+let viewportReady = false;
+
+const VIEWPORT_STABLE_FRAMES = 4;
+const VIEWPORT_STABLE_MAX_MS = 600;
+const VIEWPORT_POST_STABLE_MS = 120;
+
+function delay(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function waitForStableViewport() {
+  const start = performance.now();
+  let last = -1;
+  let stableFrames = 0;
+
+  while (performance.now() - start < VIEWPORT_STABLE_MAX_MS) {
+    await new Promise(requestAnimationFrame);
+    const h = window.innerHeight;
+    if (h === last) {
+      stableFrames += 1;
+      if (stableFrames >= VIEWPORT_STABLE_FRAMES) {
+        await delay(VIEWPORT_POST_STABLE_MS);
+        return;
+      }
+    } else {
+      last = h;
+      stableFrames = 1;
+    }
+  }
+}
+
+async function stabilizeViewport() {
+  if (viewportReady) return;
+
+  const app = document.getElementById("app");
+  app?.classList.remove("ready");
+  await waitForStableViewport();
+  app?.offsetHeight;
+  app?.classList.add("ready");
+  viewportReady = true;
+  applyBoardLayout();
+}
+
+window.addEventListener("pageshow", () => {
+  if (!viewportReady) void stabilizeViewport();
+});
+
 initBoardLayout();
+void stabilizeViewport();
