@@ -355,9 +355,53 @@ let viewportReady = false;
 const VIEWPORT_STABLE_FRAMES = 4;
 const VIEWPORT_STABLE_MAX_MS = 600;
 const VIEWPORT_POST_STABLE_MS = 120;
+/** Used only when env(safe-area-inset-bottom) under-reports as 0 in standalone. */
+const BOTTOM_SAFE_FLOOR_PX = 34;
 
 function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function isStandaloneDisplay() {
+  return (
+    document.documentElement.classList.contains("standalone") ||
+    window.matchMedia("(display-mode: standalone)").matches ||
+    window.matchMedia("(display-mode: fullscreen)").matches ||
+    !!window.navigator.standalone
+  );
+}
+
+function readEnvSafeAreaBottomPx() {
+  const probe = document.createElement("div");
+  probe.style.cssText =
+    "position:absolute;visibility:hidden;pointer-events:none;padding-bottom:env(safe-area-inset-bottom,0px)";
+  document.body.appendChild(probe);
+  const px = parseFloat(getComputedStyle(probe).paddingBottom) || 0;
+  probe.remove();
+  return px;
+}
+
+/**
+ * Per-device PWA bottom inset + shell height.
+ * Avoids a blanket max(34px, env()) which over/under-pads across iPhone models
+ * (15 Pro Max vs 16 Pro). Does not lock html background height.
+ */
+function syncStandaloneChrome() {
+  const root = document.documentElement;
+  if (!isStandaloneDisplay()) {
+    root.style.removeProperty("--bottom-safe");
+    root.style.removeProperty("--app-shell-height");
+    return;
+  }
+
+  const shellH = Math.round(window.visualViewport?.height ?? window.innerHeight);
+  if (shellH > 0) {
+    root.style.setProperty("--app-shell-height", `${shellH}px`);
+  }
+
+  const envBottom = readEnvSafeAreaBottomPx();
+  const bottomSafe = envBottom > 0 ? envBottom : BOTTOM_SAFE_FLOOR_PX;
+  root.style.setProperty("--bottom-safe", `${Math.round(bottomSafe)}px`);
 }
 
 async function waitForStableViewport() {
@@ -387,6 +431,7 @@ async function stabilizeViewport() {
   const app = document.getElementById("app");
   app?.classList.remove("ready");
   await waitForStableViewport();
+  syncStandaloneChrome();
   app?.offsetHeight;
   app?.classList.add("ready");
   viewportReady = true;
@@ -396,6 +441,20 @@ async function stabilizeViewport() {
 window.addEventListener("pageshow", () => {
   if (!viewportReady) void stabilizeViewport();
 });
+
+window.addEventListener("resize", () => {
+  if (!viewportReady) return;
+  syncStandaloneChrome();
+  scheduleBoardLayout();
+});
+
+if (window.visualViewport) {
+  window.visualViewport.addEventListener("resize", () => {
+    if (!viewportReady) return;
+    syncStandaloneChrome();
+    scheduleBoardLayout();
+  });
+}
 
 initBoardLayout();
 void stabilizeViewport();
